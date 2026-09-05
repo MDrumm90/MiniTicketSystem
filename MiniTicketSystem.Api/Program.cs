@@ -11,11 +11,10 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
-
-var app = builder.Build();
 builder.Services.AddDbContext<TicketDbContext>(options =>
     options.UseInMemoryDatabase("InMem"));
 
+var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
