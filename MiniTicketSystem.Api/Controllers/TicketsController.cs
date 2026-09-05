@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MiniTicketSystem.Domain.Entities;
 
 namespace MiniTicketSystem.Api.Controllers
 {
