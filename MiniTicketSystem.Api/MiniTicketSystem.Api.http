@@ -1,0 +1,6 @@
+@MiniTicketSystem.Api_HostAddress = http://localhost:5019
+
+GET {{MiniTicketSystem.Api_HostAddress}}/tickets/
+Accept: application/json
+
+###
