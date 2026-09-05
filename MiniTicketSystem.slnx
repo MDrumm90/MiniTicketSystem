@@ -2,4 +2,5 @@
   <Project Path="MiniTicketSystem.Api/MiniTicketSystem.Api.csproj" />
   <Project Path="MiniTicketSystem.Application/MiniTicketSystem.Application.csproj" Id="4fc1f96d-c30b-41f7-ae3a-b04fdf1b0948" />
   <Project Path="MiniTicketSystem.Domain/MiniTicketSystem.Domain.csproj" />
+  <Project Path="MiniTicketSystem.Infrastructure/MiniTicketSystem.Infrastructure.csproj" />
 </Solution>
