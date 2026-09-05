@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="MiniTicketSystem.Api/MiniTicketSystem.Api.csproj" />
+  <Project Path="MiniTicketSystem.Domain/MiniTicketSystem.Domain.csproj" />
 </Solution>
