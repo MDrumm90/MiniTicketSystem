@@ -12,9 +12,19 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddDbContext<TicketDbContext>(options =>
-    options.UseInMemoryDatabase("InMem"));
+options.UseInMemoryDatabase("InMem"));
 
 var app = builder.Build();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider
+        .GetRequiredService<TicketDbContext>();
+
+    await TicketDbSeeder.SeedDataAsync(context);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
