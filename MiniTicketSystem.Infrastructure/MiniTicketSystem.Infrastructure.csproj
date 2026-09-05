@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MiniTicketSystem.Application\MiniTicketSystem.Application.csproj" />
     <ProjectReference Include="..\MiniTicketSystem.Domain\MiniTicketSystem.Domain.csproj" />
   </ItemGroup>
 

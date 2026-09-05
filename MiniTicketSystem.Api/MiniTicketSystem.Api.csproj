@@ -13,4 +13,9 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MiniTicketSystem.Domain\MiniTicketSystem.Domain.csproj" />
+    <ProjectReference Include="..\MiniTicketSystem.Infrastructure\MiniTicketSystem.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
