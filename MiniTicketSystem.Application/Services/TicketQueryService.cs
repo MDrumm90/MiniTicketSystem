@@ -15,6 +15,10 @@ namespace MiniTicketSystem.Application.Services
             _repository = repository;
         }
 
+        /// <summary>
+        /// Gets all tickets asynchronously.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation. The task result contains an IEnumerable of TicketDto.</returns>
         public async Task<IEnumerable<TicketDto>> GetAllTicketsAsync()
         {
             var tickets = await _repository.GetAllAsync();
@@ -22,9 +26,20 @@ namespace MiniTicketSystem.Application.Services
                 x.Id,
                 x.Title,
                 x.Description,
-                x.Status));
+                x.Status,
+                x.UpdatedAt,
+                x.DateCreated,
+                x.DateClosed));
         }
 
+        /// <summary>
+        /// Gets a paged list of tickets asynchronously.
+        /// </summary>
+        /// <param name="status">The status to filter tickets by.</param>
+        /// <param name="search">The search term to filter tickets by title or description.</param>
+        /// <param name="page">The page number to retrieve.</param>
+        /// <param name="pageSize">The number of tickets per page.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a PagedResult of TicketDto.</returns>
         public async Task<PagedResult<TicketDto>> GetPagedTicketsAsync(
          TicketStatus? status,
          string? search,
@@ -46,7 +61,10 @@ namespace MiniTicketSystem.Application.Services
                     x.Id,
                     x.Title,
                     x.Description,
-                    x.Status))
+                    x.Status,
+                    x.UpdatedAt,
+                    x.DateCreated,
+                    x.DateClosed))
                 .ToList();
 
             var totalPages = (int)Math.Ceiling(

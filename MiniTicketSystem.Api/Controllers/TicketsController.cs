@@ -10,10 +10,12 @@ namespace MiniTicketSystem.Api.Controllers
     public class TicketsController : ControllerBase
     {
         private readonly ITicketQueryService _ticketQueryService;
+        private readonly ITicketCommandService _ticketCommandService;
 
-        public TicketsController(ITicketQueryService ticketQueryService)
+        public TicketsController(ITicketQueryService ticketQueryService, ITicketCommandService ticketCommandService)
         {
             _ticketQueryService = ticketQueryService;
+            _ticketCommandService = ticketCommandService;
         }
 
 
@@ -25,10 +27,29 @@ namespace MiniTicketSystem.Api.Controllers
         }
 
         [HttpGet(Name = "Get")]
-        public async Task<IEnumerable<TicketDto>> Get(string? search)
+        public async Task<IEnumerable<TicketDto>> Get()
         {
             var result = await _ticketQueryService.GetAllTicketsAsync();
             return result;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<TicketDto>> CreateTicket(TicketInsertDto dto)
+        {
+            var result = await _ticketCommandService.CreateTicketAsync(dto);
+            return Created($"/tickets/{result.Id}", result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<TicketDto>> UpdateTicket(TicketUpdateDto dto)
+        {
+            var result = await _ticketCommandService.UpdateTicketAsync(dto);
+            if (result is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
         }
     }
 }

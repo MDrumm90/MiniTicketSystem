@@ -9,5 +9,8 @@ namespace MiniTicketSystem.Application.DTOs
         Guid Id,
         string Title,
         string Description,
-        TicketStatus Status);
+        TicketStatus Status,
+        DateTime? UpdatedAt,
+        DateTime DateCreated,
+        DateTime? DateClosed);
 }

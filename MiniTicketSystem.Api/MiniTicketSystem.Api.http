@@ -9,3 +9,26 @@ GET {{MiniTicketSystem.Api_HostAddress}}/tickets?status=Open&search=&page=1&page
 Accept: application/json
 
 ###
+
+POST {{MiniTicketSystem.Api_HostAddress}}/tickets
+Content-Type: application/json
+
+{
+  "title": "New ticket",
+  "description": "Something broke"
+}
+
+###
+
+PUT {{MiniTicketSystem.Api_HostAddress}}/tickets/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "title": "Updated ticket",
+  "description": "Something broke, now fixed",
+  "status": "Closed"
+}
+
+###
+

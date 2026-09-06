@@ -10,5 +10,6 @@ namespace MiniTicketSystem.Domain.Entities
         public TicketStatus Status { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateClosed { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }

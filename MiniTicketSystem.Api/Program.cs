@@ -13,6 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ITicketQueryService, TicketQueryService>();
+builder.Services.AddScoped<ITicketCommandService, TicketCommandService>();
 builder.Services.AddDbContext<TicketDbContext>(options =>
 options.UseInMemoryDatabase("InMem"));
 
