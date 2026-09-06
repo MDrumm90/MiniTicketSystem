@@ -1,14 +1,12 @@
 ﻿using MiniTicketSystem.Application.DTOs;
-using MiniTicketSystem.Application.Models;
-using MiniTicketSystem.Domain.Entities;
 using MiniTicketSystem.Domain.Enum;
 
 namespace MiniTicketSystem.Application.Interfaces
 {
-    public interface ITicketRepository
+    public interface ITicketQueryService
     {
-        Task<IEnumerable<Ticket>> GetAllAsync();
-        Task<TicketPage> GetPageAsync(
+        Task<IEnumerable<TicketDto>> GetAllTicketsAsync();
+        Task<PagedResult<TicketDto>> GetPagedTicketsAsync(
         TicketStatus? status,
         string? search,
         int page,

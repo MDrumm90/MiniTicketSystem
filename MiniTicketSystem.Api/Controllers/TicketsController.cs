@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using MiniTicketSystem.Domain.Entities;
+using MiniTicketSystem.Application.DTOs;
+using MiniTicketSystem.Application.Interfaces;
+using MiniTicketSystem.Domain.Enum;
 
 namespace MiniTicketSystem.Api.Controllers
 {
@@ -7,15 +9,26 @@ namespace MiniTicketSystem.Api.Controllers
     [Route("[controller]")]
     public class TicketsController : ControllerBase
     {
+        private readonly ITicketQueryService _ticketQueryService;
 
-
-        [HttpGet(Name = "GetTickets")]
-        public IEnumerable<Ticket> Get()
+        public TicketsController(ITicketQueryService ticketQueryService)
         {
-            return Enumerable.Range(1, 5).Select(index => new Ticket
-            {
-            })
-            .ToArray();
+            _ticketQueryService = ticketQueryService;
+        }
+
+
+        [HttpGet(Name = "PagedTickets")]
+        public async Task<Application.DTOs.PagedResult<TicketDto>> GetPagedTickets(TicketStatus? status, string? search, int page = 1, int pageSize = 10)
+        {
+            var result = await _ticketQueryService.GetPagedTicketsAsync(status, search, page, pageSize);
+            return result;
+        }
+
+        [HttpGet(Name = "Get")]
+        public async Task<IEnumerable<TicketDto>> Get(string? search)
+        {
+            var result = await _ticketQueryService.GetAllTicketsAsync();
+            return result;
         }
     }
 }

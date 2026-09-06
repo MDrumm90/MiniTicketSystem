@@ -7,7 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.7.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MiniTicketSystem.Domain\MiniTicketSystem.Domain.csproj" />
   </ItemGroup>
 
 </Project>
