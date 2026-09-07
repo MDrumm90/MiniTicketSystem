@@ -8,6 +8,8 @@ import {
 
 import { Ticket, TicketStatus } from '../models/ticket.model';
 import { TicketService } from '../data-access/ticket.service';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 type TicketViewMode = 'all' | 'paged';
 
@@ -50,8 +52,23 @@ export const TicketsStore = signalStore(
 
     withMethods((store) => {
         const ticketService = inject(TicketService);
+        const searchSubject = new Subject<string>();
 
+        searchSubject
+            .pipe(
+                debounceTime(400),
+                distinctUntilChanged()
+            )
+            .subscribe(searchTerm => {
+                patchState(store, {
+                    searchTerm,
+                    page: 1
+                });
 
+                if (store.viewMode() === 'paged') {
+                    loadPaged();
+                }
+            });
 
         const loadAll = () => {
             patchState(store, {
@@ -111,14 +128,7 @@ export const TicketsStore = signalStore(
             loadAll,
             loadPaged,
             setSearchTerm(searchTerm: string) {
-                patchState(store, {
-                    searchTerm,
-                    page: 1
-                });
-
-                if (store.viewMode() === 'paged') {
-                    loadPaged();
-                }
+                searchSubject.next(searchTerm);
             },
 
             setStatusFilter(status: TicketStatus | undefined) {
@@ -131,7 +141,6 @@ export const TicketsStore = signalStore(
                     loadPaged();
                 }
             },
-
             setPage(page: number) {
                 patchState(store, {
                     page
