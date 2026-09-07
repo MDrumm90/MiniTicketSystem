@@ -1,8 +1,8 @@
 <section class="ticket-form-page">
   <div class="page-header">
     <div>
-      <h1>New ticket</h1>
-      <p>Create a new support ticket</p>
+      <h1>{{ isEditMode ? 'Edit ticket' : 'New ticket' }}</h1>
+      <p>{{ isEditMode ? 'Edit the support ticket' : 'Create a new support ticket' }}</p>
     </div>
   </div>
 
@@ -12,6 +12,10 @@
     <span>{{ store.error() }}</span>
   </div>
 }
+
+@if (store.loading()) {
+  <p>Loading ticket...</p>
+} @else {
   <form class="ticket-form" [formGroup]="form" (ngSubmit)="onSubmit()">
 
     <div class="form-field">
@@ -36,19 +40,34 @@
       <textarea id="description" rows="6" formControlName="description" placeholder="Describe the issue..."></textarea>
     </div>
 
+    @if (isEditMode) {
+    <div class="form-field">
+      <label for="status">
+        Status
+      </label>
+
+      <select id="status" formControlName="status">
+        @for (option of statusOptions; track option.value) {
+        <option [ngValue]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+    }
+
     <div class="form-actions">
 
       <button type="button" class="secondary-button">
         Cancel
       </button>
 
-      <button type="submit" class="primary-button" [disabled]="form.invalid || store.saving()">
+      <button type="submit" class="primary-button" [disabled]="form.invalid || store.saving() || store.loading()">
         @if (store.saving()) {
-        Creating...
+        {{ isEditMode ? 'Updating...' : 'Creating...' }}
         } @else {
-        Create ticket
+        {{ isEditMode ? 'Update ticket' : 'Create ticket' }}
         }
       </button>
     </div>
   </form>
+}
 </section>

@@ -9,15 +9,20 @@ import {
 
 import { CreateTicket } from '../models/create-ticket.model';
 import { UpdateTicket } from '../models/update-ticket.model';
+import { Ticket } from '../models/ticket.model';
 import { TicketService } from '../data-access/ticket.service';
 
 type TicketFormState = {
+    ticket: Ticket | null;
+    loading: boolean;
     saving: boolean;
     error: string | null;
 };
 
 export const TicketFormStore = signalStore(
     withState<TicketFormState>({
+        ticket: null,
+        loading: false,
         saving: false,
         error: null
     }),
@@ -69,9 +74,37 @@ export const TicketFormStore = signalStore(
             );
         };
 
+        const loadTicket = (id: string) => {
+            patchState(store, {
+                loading: true,
+                error: null
+            });
+
+            return ticketService.getById(id).pipe(
+                tap({
+                    next: (ticket) => {
+                        patchState(store, {
+                            ticket
+                        });
+                    },
+                    error: () => {
+                        patchState(store, {
+                            error: 'Failed to load ticket'
+                        });
+                    }
+                }),
+                finalize(() => {
+                    patchState(store, {
+                        loading: false
+                    });
+                })
+            );
+        };
+
         return {
             createTicket,
-            updateTicket
+            updateTicket,
+            loadTicket
         };
     })
 );

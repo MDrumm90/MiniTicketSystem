@@ -91,7 +91,7 @@ select {
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 1fr 2fr 160px;
+  grid-template-columns: 1fr 2fr 160px 100px;
   gap: 24px;
   align-items: center;
 
@@ -143,6 +143,17 @@ select {
 .status-closed {
   background: #f3f4f6;
   color: #4b5563;
+}
+
+.edit-link {
+  color: #2563eb;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .results-info {

@@ -41,6 +41,7 @@
       <div>Title</div>
       <div>Description</div>
       <div>Status</div>
+      <div>Actions</div>
     </div>
 
     @for (ticket of store.tickets(); track ticket.id) {
@@ -62,6 +63,12 @@
           >
             {{ getStatusLabel(ticket.status) }}
           </span>
+        </div>
+
+        <div class="actions">
+          <a class="edit-link" [routerLink]="['/tickets', ticket.id, 'edit']">
+            Edit
+          </a>
         </div>
       </div>
     }

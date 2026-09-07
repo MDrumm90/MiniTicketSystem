@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { TicketsStore } from '../../store/tickets.store';
 import { TicketStatus } from '../../models/ticket.model';
@@ -6,7 +7,7 @@ import { TicketStatus } from '../../models/ticket.model';
 @Component({
   selector: 'app-ticket-list',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './ticket-list.html',
   styleUrl: './ticket-list.scss',
   providers: [TicketsStore]

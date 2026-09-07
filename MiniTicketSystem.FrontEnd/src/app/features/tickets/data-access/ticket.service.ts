@@ -30,6 +30,10 @@ export class TicketService {
     return this.http.get<Ticket[]>(this.apiUrl);
   }
 
+  getById(id: string): Observable<Ticket> {
+    return this.http.get<Ticket>(`${this.apiUrl}/${id}`);
+  }
+
   getPaged(
     status?: TicketStatus,
     search?: string,

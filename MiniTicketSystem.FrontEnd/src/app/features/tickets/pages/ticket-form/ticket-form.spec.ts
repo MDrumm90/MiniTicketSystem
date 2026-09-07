@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
 
 import { TicketForm } from './ticket-form';
 
@@ -8,7 +9,13 @@ describe('TicketForm', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TicketForm]
+      imports: [TicketForm],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: convertToParamMap({}) } }
+        }
+      ]
     })
     .compileComponents();
 
