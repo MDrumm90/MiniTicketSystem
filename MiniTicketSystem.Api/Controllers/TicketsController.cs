@@ -18,8 +18,7 @@ namespace MiniTicketSystem.Api.Controllers
             _ticketCommandService = ticketCommandService;
         }
 
-
-        [HttpGet(Name = "PagedTickets")]
+        [HttpGet("Paged", Name = "PagedTickets")]
         public async Task<Application.DTOs.PagedResult<TicketDto>> GetPagedTickets(TicketStatus? status, string? search, int page = 1, int pageSize = 10)
         {
             var result = await _ticketQueryService.GetPagedTicketsAsync(status, search, page, pageSize);
