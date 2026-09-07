@@ -1,3 +1,11 @@
+URL's:
+
+**Frontend Azure URL:**
+https://witty-glacier-09fef5e03.5.azurestaticapps.net/
+
+**Backend Azure URL:**
+https://mini-ticket-api-grb7apfcdbcjhyf2.polandcentral-01.azurewebsites.net/
+
 ## Frontend
 
 The frontend is built with **Angular 20** using standalone components and a feature-based architecture.
