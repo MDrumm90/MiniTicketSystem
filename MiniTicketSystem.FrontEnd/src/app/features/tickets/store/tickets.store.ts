@@ -1,0 +1,158 @@
+import { inject } from '@angular/core';
+import {
+    signalStore,
+    withState,
+    withMethods,
+    patchState
+} from '@ngrx/signals';
+
+import { Ticket, TicketStatus } from '../models/ticket.model';
+import { TicketService } from '../data-access/ticket.service';
+
+type TicketViewMode = 'all' | 'paged';
+
+type TicketsState = {
+    viewMode: TicketViewMode;
+
+    tickets: Ticket[];
+
+    loading: boolean;
+    error: string | null;
+
+    searchTerm: string;
+    statusFilter: TicketStatus | undefined;
+
+    page: number;
+    pageSize: number;
+
+    totalCount: number;
+    totalPages: number;
+};
+
+export const TicketsStore = signalStore(
+    withState<TicketsState>({
+        viewMode: 'all',
+
+        tickets: [],
+
+        loading: false,
+        error: null,
+
+        searchTerm: '',
+        statusFilter: undefined,
+
+        page: 1,
+        pageSize: 10,
+
+        totalCount: 0,
+        totalPages: 0
+    }),
+
+    withMethods((store) => {
+        const ticketService = inject(TicketService);
+
+
+
+        const loadAll = () => {
+            patchState(store, {
+                loading: true,
+                error: null
+            });
+
+            ticketService.getAll().subscribe({
+                next: tickets => {
+                    patchState(store, {
+                        tickets,
+                        loading: false
+                    });
+                },
+
+                error: () => {
+                    patchState(store, {
+                        loading: false,
+                        error: 'Failed to load tickets'
+                    });
+                }
+            });
+        };
+
+        const loadPaged = () => {
+            patchState(store, {
+                loading: true,
+                error: null
+            });
+
+            ticketService.getPaged(
+                store.statusFilter(),
+                store.searchTerm(),
+                store.page(),
+                store.pageSize()
+            ).subscribe({
+                next: result => {
+                    patchState(store, {
+                        tickets: result.items,
+                        totalCount: result.totalCount,
+                        totalPages: result.totalPages,
+                        loading: false
+                    });
+                },
+
+                error: () => {
+                    patchState(store, {
+                        loading: false,
+                        error: 'Failed to load tickets'
+                    });
+                }
+            });
+        };
+
+
+        return {
+            loadAll,
+            loadPaged,
+            setSearchTerm(searchTerm: string) {
+                patchState(store, {
+                    searchTerm,
+                    page: 1
+                });
+
+                if (store.viewMode() === 'paged') {
+                    loadPaged();
+                }
+            },
+
+            setStatusFilter(status: TicketStatus | undefined) {
+                patchState(store, {
+                    statusFilter: status,
+                    page: 1
+                });
+
+                if (store.viewMode() === 'paged') {
+                    loadPaged();
+                }
+            },
+
+            setPage(page: number) {
+                patchState(store, {
+                    page
+                });
+
+                if (store.viewMode() === 'paged') {
+                    loadPaged();
+                }
+            },
+            setViewMode(mode: TicketViewMode) {
+                patchState(store, {
+                    viewMode: mode,
+                    page: 1
+                });
+
+                if (mode === 'all') {
+                    loadAll();
+                } else {
+                    loadPaged();
+                }
+            }
+        };
+    })
+);
