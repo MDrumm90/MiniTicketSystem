@@ -1,5 +1,5 @@
 Folder PATH listing for volume Windows
-Volume serial number is 00000009 D823:EC37
+Volume serial number is 0000004C D823:EC37
 C:.
 -   .editorconfig
 -   .gitignore
@@ -11,12 +11,7 @@ C:.
 -   tsconfig.app.json
 -   tsconfig.json
 -   tsconfig.spec.json
--   
-+���.vscode
--       extensions.json
--       launch.json
--       tasks.json
--       
+-                       
 +���public
 -       favicon.ico
 -       
@@ -26,10 +21,29 @@ L���src
     -   styles.scss
     -   
     L���app
-            app.config.ts
-            app.html
-            app.routes.ts
-            app.scss
-            app.spec.ts
-            app.ts
-            
+        -   app.config.ts
+        -   app.html
+        -   app.routes.ts
+        -   app.scss
+        -   app.spec.ts
+        -   app.ts
+        -   
+        L���layout
+            +���header
+            -       header.html
+            -       header.scss
+            -       header.spec.ts
+            -       header.ts
+            -       
+            +���main-layout
+            -       main-layout.html
+            -       main-layout.scss
+            -       main-layout.spec.ts
+            -       main-layout.ts
+            -       
+            L���sidebar
+                    sidebar.html
+                    sidebar.scss
+                    sidebar.spec.ts
+                    sidebar.ts
+                    
