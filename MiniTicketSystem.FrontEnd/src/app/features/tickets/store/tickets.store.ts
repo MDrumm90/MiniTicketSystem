@@ -141,7 +141,22 @@ export const TicketsStore = signalStore(
                     loadPaged();
                 }
             },
+
+            setPageSize(pageSize: number) {
+                patchState(store, {
+                    pageSize,
+                    page: 1
+                });
+
+                if (store.viewMode() === 'paged') {
+                    loadPaged();
+                }
+            },
             setPage(page: number) {
+                if (page < 1 || page > store.totalPages()) {
+                    return;
+                }
+
                 patchState(store, {
                     page
                 });

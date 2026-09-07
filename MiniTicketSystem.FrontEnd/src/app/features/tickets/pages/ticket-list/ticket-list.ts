@@ -58,4 +58,10 @@ export class TicketList {
 
     this.store.setStatusFilter(status);
   }
+  
+  onPageSizeChange(event: Event): void {
+  const value = (event.target as HTMLSelectElement).value;
+
+  this.store.setPageSize(Number(value));
+}
 }

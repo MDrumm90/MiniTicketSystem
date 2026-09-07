@@ -1,60 +1,107 @@
 <div class="view-switch">
-  <button
-    type="button"
-    [class.active]="store.viewMode() === 'all'"
-    (click)="store.setViewMode('all')"
-  >
+  <button type="button" [class.active]="store.viewMode() === 'all'" (click)="store.setViewMode('all')">
     All tickets
   </button>
 
-  <button
-    type="button"
-    [class.active]="store.viewMode() === 'paged'"
-    (click)="store.setViewMode('paged')"
-  >
+  <button type="button" [class.active]="store.viewMode() === 'paged'" (click)="store.setViewMode('paged')">
     Paginated
   </button>
 </div>
 @if (store.viewMode() === 'paged') {
 <div class="filters">
 
-<input
-  type="text"
-  placeholder="Search tickets..."
-  (input)="onSearchChange($event)"
-/>
+  <input type="text" placeholder="Search tickets..." (input)="onSearchChange($event)" />
 
-<select (change)="onStatusChange($event)">
-  <option value="">All statuses</option>
+  <select (change)="onStatusChange($event)">
+    <option value="">All statuses</option>
 
-  @for (status of statuses; track status) {
+    @for (status of statuses; track status) {
     <option [value]="status">
       {{ getStatusLabel(status) }}
     </option>
-  }
-</select>
+    }
+  </select>
 
 </div>
 }
-@for (ticket of store.tickets(); track ticket.id) {
-  <div class="table-row">
-    <div class="ticket-title">
-      {{ ticket.title }}
-    </div>
 
-    <div class="ticket-description">
-      {{ ticket.description }}
-    </div>
-
-    <div>
-      <span
-        class="status"
-        [class.status-open]="ticket.status === TicketStatus.Open"
-        [class.status-progress]="ticket.status === TicketStatus.InProgress"
-        [class.status-closed]="ticket.status === TicketStatus.Closed"
->
-       {{ getStatusLabel(ticket.status) }}
-      </span>
-    </div>
+@if (store.loading()) {
+  <div class="loading">
+    Loading tickets...
   </div>
+
+  } @else if (store.error()) {
+  <div class="error">
+    {{ store.error() }}
+  </div>
+} @else {
+  <div class="ticket-table">
+
+    <div class="table-header">
+      <div>Title</div>
+      <div>Description</div>
+      <div>Status</div>
+    </div>
+
+    @for (ticket of store.tickets(); track ticket.id) {
+      <div class="table-row">
+        <div class="ticket-title">
+          {{ ticket.title }}
+        </div>
+
+        <div class="ticket-description">
+          {{ ticket.description }}
+        </div>
+
+        <div>
+          <span
+            class="status"
+            [class.status-open]="ticket.status === TicketStatus.Open"
+            [class.status-progress]="ticket.status === TicketStatus.InProgress"
+            [class.status-closed]="ticket.status === TicketStatus.Closed"
+          >
+            {{ getStatusLabel(ticket.status) }}
+          </span>
+        </div>
+      </div>
+    }
+
+  </div>
+}
+
+
+@if (store.viewMode() === 'paged') {
+<div class="pagination">
+
+  <div class="page-size">
+    <label for="pageSize">Items per page:</label>
+
+    <select id="pageSize" [value]="store.pageSize()" (change)="onPageSizeChange($event)">
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+    </select>
+  </div>
+
+  <button type="button" [disabled]="store.page() <= 1 || store.totalPages() === 0"
+    (click)="store.setPage(store.page() - 1)">
+    Previous
+  </button>
+
+  <span>
+    @if (store.totalPages() > 0) {
+    <span>
+      Page {{ store.page() }} of {{ store.totalPages() }}
+    </span>
+    } @else {
+    <span>No tickets found</span>
+    }
+  </span>
+
+  <button type="button" [disabled]="store.page() >= store.totalPages() || store.totalPages() === 0"
+    (click)="store.setPage(store.page() + 1)">
+    Next
+  </button>
+
+</div>
 }

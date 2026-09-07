@@ -19,27 +19,27 @@ export class TicketService {
   }
 
   getPaged(
-    status?: TicketStatus,
-    search?: string,
-    page = 1,
-    pageSize = 10
-  ): Observable<PagedResult<Ticket>> {
+  status?: TicketStatus,
+  search?: string,
+  page = 1,
+  pageSize = 10
+): Observable<PagedResult<Ticket>> {
 
-    let params = new HttpParams()
-      .set('page', page)
-      .set('pageSize', pageSize);
+  let params = new HttpParams()
+    .set('page', page)
+    .set('pageSize', pageSize);
 
-    if (status !== undefined) {
-      params = params.set('status', status);
-    }
-
-    if (search?.trim()) {
-      params = params.set('search', search.trim());
-    }
-
-    return this.http.get<PagedResult<Ticket>>(
-      `${this.apiUrl}/paged`,
-      { params }
-    );
+  if (status !== undefined) {
+    params = params.set('status', status);
   }
+
+  if (search?.trim()) {
+    params = params.set('search', search.trim());
+  }
+
+  return this.http.get<PagedResult<Ticket>>(
+    `${this.apiUrl}/paged`,
+    { params }
+  );
+}
 }
