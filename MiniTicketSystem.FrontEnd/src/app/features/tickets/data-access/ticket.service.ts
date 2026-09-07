@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { environment } from '../../../../environments/environments';
 import { Ticket, TicketStatus } from '../models/ticket.model';
 import { PagedResult } from '../models/paged-result.model';
 import { CreateTicket } from '../models/create-ticket.model';
@@ -13,7 +13,7 @@ export class TicketService {
 
   private readonly http = inject(HttpClient);
 
-  private readonly apiUrl = 'http://localhost:5019/Tickets';
+  private readonly apiUrl = `${environment.apiUrl}/Tickets`;
 
  create(ticket: CreateTicket): Observable<Ticket> {
     return this.http.post<Ticket>(this.apiUrl, ticket);
