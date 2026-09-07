@@ -1,0 +1,54 @@
+<section class="ticket-form-page">
+  <div class="page-header">
+    <div>
+      <h1>New ticket</h1>
+      <p>Create a new support ticket</p>
+    </div>
+  </div>
+
+@if (store.error()) {
+  <div class="error-message" role="alert">
+    <span class="error-icon">!</span>
+    <span>{{ store.error() }}</span>
+  </div>
+}
+  <form class="ticket-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <div class="form-field">
+      <label for="title">
+        Title
+      </label>
+
+      <input id="title" type="text" formControlName="title" placeholder="Enter ticket title" />
+
+      @if (form.controls.title.touched && form.controls.title.invalid) {
+      <span class="validation-error">
+        Title is required.
+      </span>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="description">
+        Description
+      </label>
+
+      <textarea id="description" rows="6" formControlName="description" placeholder="Describe the issue..."></textarea>
+    </div>
+
+    <div class="form-actions">
+
+      <button type="button" class="secondary-button">
+        Cancel
+      </button>
+
+      <button type="submit" class="primary-button" [disabled]="form.invalid || store.saving()">
+        @if (store.saving()) {
+        Creating...
+        } @else {
+        Create ticket
+        }
+      </button>
+    </div>
+  </form>
+</section>

@@ -8,9 +8,20 @@ export const routes: Routes = [
     children: [
       {
         path: 'tickets',
-        loadComponent: () =>
-          import('./features/tickets/pages/ticket-list/ticket-list')
-            .then(m => m.TicketList)
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/tickets/pages/ticket-list/ticket-list')
+                .then(m => m.TicketList)
+          },
+          {
+            path: 'new',
+            loadComponent: () =>
+              import('./features/tickets/pages/ticket-form/ticket-form')
+                .then(m => m.TicketForm)
+          }
+        ]
       }
     ]
   },
