@@ -4,7 +4,7 @@ using MiniTicketSystem.Domain.Enum;
 namespace MiniTicketSystem.Application.DTOs
 {
     public record TicketUpdateDto(
-        [property: Required] string Title,
+        string Title,
         Guid Id,
         string Description,
         TicketStatus Status);

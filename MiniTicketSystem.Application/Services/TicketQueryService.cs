@@ -77,5 +77,28 @@ namespace MiniTicketSystem.Application.Services
                 result.TotalCount,
                 totalPages);
         }
+
+        /// <summary>
+        /// Gets a single ticket by its unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the ticket.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the TicketDto if found; otherwise, null.</returns>
+        public async Task<TicketDto?> GetTicketByIdAsync(Guid id)
+        {
+            var ticket = await _repository.GetByIdAsync(id);
+            if (ticket is null)
+            {
+                return null;
+            }
+
+            return new TicketDto(
+                ticket.Id,
+                ticket.Title,
+                ticket.Description,
+                ticket.Status,
+                ticket.UpdatedAt,
+                ticket.DateCreated,
+                ticket.DateClosed);
+        }
     }
 }

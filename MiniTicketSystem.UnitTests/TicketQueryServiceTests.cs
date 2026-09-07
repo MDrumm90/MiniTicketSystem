@@ -214,5 +214,37 @@ namespace MiniTicketSystem.UnitTests
             // Act & Assert
             Should.ThrowAsync<InvalidOperationException>(() => _service.GetPagedTicketsAsync(null, null, 1, 10));
         }
+
+        [Test]
+        public async Task GetTicketByIdAsync_ExistingId_ReturnsMappedDto()
+        {
+            // Arrange
+            var ticket = new Ticket { Id = Guid.NewGuid(), Title = "Ticket 1", Description = "Description 1", Status = TicketStatus.Open };
+            _repositoryMock.Setup(r => r.GetByIdAsync(ticket.Id)).ReturnsAsync(ticket);
+
+            // Act
+            var result = await _service.GetTicketByIdAsync(ticket.Id);
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.Id.ShouldBe(ticket.Id);
+            result.Title.ShouldBe(ticket.Title);
+            result.Description.ShouldBe(ticket.Description);
+            result.Status.ShouldBe(ticket.Status);
+        }
+
+        [Test]
+        public async Task GetTicketByIdAsync_NonExistingId_ReturnsNull()
+        {
+            // Arrange
+            var id = Guid.NewGuid();
+            _repositoryMock.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Ticket?)null);
+
+            // Act
+            var result = await _service.GetTicketByIdAsync(id);
+
+            // Assert
+            result.ShouldBeNull();
+        }
     }
 }

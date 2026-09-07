@@ -32,6 +32,18 @@ namespace MiniTicketSystem.Api.Controllers
             return result;
         }
 
+        [HttpGet("{id:guid}", Name = "GetTicketById")]
+        public async Task<ActionResult<TicketDto>> GetById(Guid id)
+        {
+            var result = await _ticketQueryService.GetTicketByIdAsync(id);
+            if (result is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<ActionResult<TicketDto>> CreateTicket(TicketInsertDto dto)
         {

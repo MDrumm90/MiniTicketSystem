@@ -11,5 +11,6 @@ namespace MiniTicketSystem.Application.Interfaces
         string? search,
         int page,
         int pageSize);
+        Task<TicketDto?> GetTicketByIdAsync(Guid id);
     }
 }
