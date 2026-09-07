@@ -1,6 +1,4 @@
 import { inject } from '@angular/core';
-import { CreateTicket } from '../models/create-ticket.model';
-import { finalize, tap } from 'rxjs/operators';
 import {
     signalStore,
     withState,
@@ -19,7 +17,6 @@ type TicketsState = {
     viewMode: TicketViewMode;
 
     tickets: Ticket[];
-    saving: boolean;
     loading: boolean;
     error: string | null;
 
@@ -39,7 +36,6 @@ export const TicketsStore = signalStore(
         viewMode: 'all',
 
         tickets: [],
-        saving: false,
         loading: false,
         error: null,
 
@@ -126,31 +122,7 @@ export const TicketsStore = signalStore(
             });
         };
 
-        const createTicket = (ticket: CreateTicket) => {
-            patchState(store, {
-                saving: true,
-                error: null
-            });
-
-            return ticketService.create(ticket).pipe(
-                tap({
-                    error: () => {
-                        patchState(store, {
-                            error: 'Failed to create ticket'
-                        });
-                    }
-                }),
-                finalize(() => {
-                    patchState(store, {
-                        saving: false
-                    });
-                })
-            );
-        };
-
-
         return {
-            createTicket,
             loadAll,
             loadPaged,
             setSearchTerm(searchTerm: string) {

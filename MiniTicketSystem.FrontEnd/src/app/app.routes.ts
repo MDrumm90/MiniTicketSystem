@@ -20,6 +20,12 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./features/tickets/pages/ticket-form/ticket-form')
                 .then(m => m.TicketForm)
+          },
+          {
+            path: ':id/edit',
+            loadComponent: () =>
+              import('./features/tickets/pages/ticket-form/ticket-form')
+                .then(m => m.TicketForm)
           }
         ]
       }

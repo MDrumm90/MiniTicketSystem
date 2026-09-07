@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { Ticket, TicketStatus } from '../models/ticket.model';
 import { PagedResult } from '../models/paged-result.model';
 import { CreateTicket } from '../models/create-ticket.model';
-
+import { UpdateTicket } from '../models/update-ticket.model';
 @Injectable({
   providedIn: 'root'
 })
@@ -18,6 +18,13 @@ export class TicketService {
  create(ticket: CreateTicket): Observable<Ticket> {
     return this.http.post<Ticket>(this.apiUrl, ticket);
   }
+
+  update(ticket: UpdateTicket): Observable<Ticket> {
+  return this.http.put<Ticket>(
+    `${this.apiUrl}/${ticket.id}`,
+    ticket
+  );
+}
 
   getAll(): Observable<Ticket[]> {
     return this.http.get<Ticket[]>(this.apiUrl);

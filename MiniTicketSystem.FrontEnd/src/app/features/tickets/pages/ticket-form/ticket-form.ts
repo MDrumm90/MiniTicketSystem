@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TicketsStore } from '../../store/tickets.store';
+import { TicketFormStore } from '../../store/ticket-form.store';
 
 
 @Component({
@@ -10,7 +10,7 @@ import { TicketsStore } from '../../store/tickets.store';
   imports: [ReactiveFormsModule],
   templateUrl: './ticket-form.html',
   styleUrl: './ticket-form.scss',
-  providers: [TicketsStore]
+  providers: [TicketFormStore]
 })
 
 
@@ -18,7 +18,7 @@ import { TicketsStore } from '../../store/tickets.store';
 export class TicketForm {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
-  readonly store = inject(TicketsStore);
+  readonly store = inject(TicketFormStore);
 
   readonly form = this.fb.nonNullable.group({
     title: ['', [Validators.required]],
