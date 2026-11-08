@@ -505,9 +505,22 @@ The API uses appropriate HTTP status codes for common scenarios, including:
 201 Created
 400 Bad Request
 404 Not Found
+500 Internal Server Error
 ```
 
 Validation is applied to incoming DTOs before processing requests.
+
+`TicketQueryService` and `TicketCommandService` wrap their operations in `try/catch` blocks. Unexpected errors (e.g. repository/database failures) are logged with `ILogger` together with operation context (ticket id, paging parameters) and rethrown as a `TicketServiceException` containing a user-friendly message.
+
+`TicketsController` translates `TicketServiceException` into a `500 Internal Server Error` response in the `ProblemDetails` format, without exposing technical details to the client:
+
+```json
+{
+  "title": "Wystąpił błąd",
+  "status": 500,
+  "detail": "Wystąpił błąd podczas pobierania zgłoszeń. Spróbuj ponownie później."
+}
+```
 
 ### Unit testing
 
