@@ -1,0 +1,68 @@
+name: Azure App Service - API CI/CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "MiniTicketSystem.Api/**"
+      - "MiniTicketSystem.Application/**"
+      - "MiniTicketSystem.Domain/**"
+      - "MiniTicketSystem.Infrastructure/**"
+      - "MiniTicketSystem.UnitTests/**"
+      - "MiniTicketSystem.slnx"
+      - ".github/workflows/azure-api-deploy.yml"
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: mini-ticket-api
+  DOTNET_VERSION: "10.0.x"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build and Test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore MiniTicketSystem.slnx
+
+      - name: Test
+        run: dotnet test MiniTicketSystem.slnx --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish MiniTicketSystem.Api/MiniTicketSystem.Api.csproj --configuration Release --no-restore --output ./publish
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api
+          path: ./publish
+
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Azure App Service
+    needs: build
+    environment:
+      name: Production
+      url: ${{ steps.deploy.outputs.webapp-url }}
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: api
+          path: ./publish
+
+      - name: Deploy
+        id: deploy
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./publish

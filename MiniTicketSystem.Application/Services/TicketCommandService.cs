@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Logging;
 using MiniTicketSystem.Application.DTOs;
+using MiniTicketSystem.Application.Exceptions;
 using MiniTicketSystem.Application.Interfaces;
 using MiniTicketSystem.Domain.Entities;
 using MiniTicketSystem.Domain.Enum;
@@ -8,10 +10,12 @@ namespace MiniTicketSystem.Application.Services
     public class TicketCommandService : ITicketCommandService
     {
         private readonly ITicketRepository _repository;
+        private readonly ILogger<TicketCommandService> _logger;
 
-        public TicketCommandService(ITicketRepository repository)
+        public TicketCommandService(ITicketRepository repository, ILogger<TicketCommandService> logger)
         {
             _repository = repository;
+            _logger = logger;
         }
 
         /// <summary>
@@ -19,21 +23,30 @@ namespace MiniTicketSystem.Application.Services
         /// </summary>
         /// <param name="dto">The TicketInsertDto containing the details of the ticket to be created.</param>
         /// <returns> The newly created TicketDto.</returns>
+        /// <exception cref="TicketServiceException">Thrown when the ticket could not be created.</exception>
         public async Task<TicketDto> CreateTicketAsync(TicketInsertDto dto)
         {
-            var ticket = new Ticket
+            try
             {
-                Id = Guid.NewGuid(),
-                Title = dto.Title,
-                Description = dto.Description,
-                Status = TicketStatus.Open,
-                DateCreated = DateTime.UtcNow,
-                UpdatedAt = null,
-            };
+                var ticket = new Ticket
+                {
+                    Id = Guid.NewGuid(),
+                    Title = dto.Title,
+                    Description = dto.Description,
+                    Status = TicketStatus.Open,
+                    DateCreated = DateTime.UtcNow,
+                    UpdatedAt = null,
+                };
 
-            await _repository.AddAsync(ticket);
+                await _repository.AddAsync(ticket);
 
-            return new TicketDto(ticket.Id, ticket.Title, ticket.Description, ticket.Status, ticket.UpdatedAt, ticket.DateCreated, ticket.DateClosed);
+                return new TicketDto(ticket.Id, ticket.Title, ticket.Description, ticket.Status, ticket.UpdatedAt, ticket.DateCreated, ticket.DateClosed);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating ticket with title {Title}", dto.Title);
+                throw new TicketServiceException("Wystąpił błąd podczas tworzenia zgłoszenia. Spróbuj ponownie później.", ex);
+            }
         }
 
 
@@ -42,33 +55,41 @@ namespace MiniTicketSystem.Application.Services
         /// </summary>
         /// <param name="dto">The TicketUpdateDto containing the details of the ticket to be updated.</param>
         /// <returns> The updated TicketDto if the ticket is found; otherwise, null.</returns>
+        /// <exception cref="TicketServiceException">Thrown when the ticket could not be updated.</exception>
         public async Task<TicketDto?> UpdateTicketAsync(TicketUpdateDto dto)
         {
-            var ticket = await _repository.GetByIdAsync(dto.Id);
-            if (ticket is null)
+            try
             {
-                return null;
+                var ticket = await _repository.GetByIdAsync(dto.Id);
+                if (ticket is null)
+                {
+                    return null;
+                }
+
+                ticket.Title = dto.Title;
+                ticket.Description = dto.Description;
+
+                if (dto.Status == TicketStatus.Closed && ticket.Status != TicketStatus.Closed)
+                {
+                    ticket.DateClosed = DateTime.UtcNow;
+                }
+                else if (dto.Status != TicketStatus.Closed && ticket.Status == TicketStatus.Closed)
+                {
+                    ticket.DateClosed = default;
+                }
+
+                ticket.Status = dto.Status;
+                ticket.UpdatedAt = DateTime.UtcNow;
+
+                await _repository.UpdateAsync(ticket);
+
+                return new TicketDto(ticket.Id, ticket.Title, ticket.Description, ticket.Status, ticket.UpdatedAt, ticket.DateCreated, ticket.DateClosed);
             }
-
-            ticket.Title = dto.Title;
-            ticket.Description = dto.Description;
-
-            if (dto.Status == TicketStatus.Closed && ticket.Status != TicketStatus.Closed)
+            catch (Exception ex)
             {
-                ticket.DateClosed = DateTime.UtcNow;
+                _logger.LogError(ex, "Error while updating ticket {TicketId}", dto.Id);
+                throw new TicketServiceException("Wystąpił błąd podczas aktualizacji zgłoszenia. Spróbuj ponownie później.", ex);
             }
-            else if (dto.Status != TicketStatus.Closed && ticket.Status == TicketStatus.Closed)
-            {
-                ticket.DateClosed = default;
-            }
-
-            ticket.Status = dto.Status;
-            ticket.UpdatedAt = DateTime.UtcNow;
-
-            await _repository.UpdateAsync(ticket);
-
-            return new TicketDto(ticket.Id, ticket.Title, ticket.Description, ticket.Status, ticket.UpdatedAt, ticket.DateCreated, ticket.DateClosed);
-
         }
     }
 }

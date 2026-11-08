@@ -1,4 +1,6 @@
-﻿using MiniTicketSystem.Application.DTOs;
+using Microsoft.Extensions.Logging;
+using MiniTicketSystem.Application.DTOs;
+using MiniTicketSystem.Application.Exceptions;
 using MiniTicketSystem.Application.Interfaces;
 using MiniTicketSystem.Application.Models;
 using MiniTicketSystem.Application.Services;
@@ -12,21 +14,32 @@ namespace MiniTicketSystem.UnitTests
     public class TicketCommandServiceTests
     {
         private Mock<ITicketRepository> _repositoryMock;
+        private Mock<ILogger<TicketCommandService>> _loggerMock;
         private TicketCommandService _service;
 
         [SetUp]
         public void Setup()
         {
             _repositoryMock = new Mock<ITicketRepository>();
-            _service = new TicketCommandService(_repositoryMock.Object);
+            _loggerMock = new Mock<ILogger<TicketCommandService>>();
+            _service = new TicketCommandService(_repositoryMock.Object, _loggerMock.Object);
         }
 
         [TearDown]
         public void TearDown()
         {
             _repositoryMock = null;
+            _loggerMock = null;
             _service = null;
         }
+
+        private void VerifyErrorLogged(Exception expected) =>
+            _loggerMock.Verify(l => l.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                expected,
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), Times.Once);
 
         [Test]
         public async Task CreateTicketAsync_ValidDto_ReturnsMappedDtoWithOpenStatus()
@@ -62,14 +75,17 @@ namespace MiniTicketSystem.UnitTests
         }
 
         [Test]
-        public void CreateTicketAsync_RepositoryThrows_PropagatesException()
+        public async Task CreateTicketAsync_RepositoryThrows_LogsErrorAndThrowsTicketServiceException()
         {
             // Arrange
             var dto = new TicketInsertDto("New Ticket", "New Description");
-            _repositoryMock.Setup(r => r.AddAsync(It.IsAny<Ticket>())).ThrowsAsync(new InvalidOperationException("repository failure"));
+            var repositoryException = new InvalidOperationException("repository failure");
+            _repositoryMock.Setup(r => r.AddAsync(It.IsAny<Ticket>())).ThrowsAsync(repositoryException);
 
             // Act & Assert
-            Should.ThrowAsync<InvalidOperationException>(() => _service.CreateTicketAsync(dto));
+            var ex = await Should.ThrowAsync<TicketServiceException>(() => _service.CreateTicketAsync(dto));
+            ex.InnerException.ShouldBe(repositoryException);
+            VerifyErrorLogged(repositoryException);
         }
 
         [Test]
@@ -214,14 +230,32 @@ namespace MiniTicketSystem.UnitTests
         }
 
         [Test]
-        public void UpdateTicketAsync_RepositoryGetByIdThrows_PropagatesException()
+        public async Task UpdateTicketAsync_RepositoryGetByIdThrows_LogsErrorAndThrowsTicketServiceException()
         {
             // Arrange
             var dto = new TicketUpdateDto("Title", Guid.NewGuid(), "Description", TicketStatus.Open);
-            _repositoryMock.Setup(r => r.GetByIdAsync(dto.Id)).ThrowsAsync(new InvalidOperationException("repository failure"));
+            var repositoryException = new InvalidOperationException("repository failure");
+            _repositoryMock.Setup(r => r.GetByIdAsync(dto.Id)).ThrowsAsync(repositoryException);
 
             // Act & Assert
-            Should.ThrowAsync<InvalidOperationException>(() => _service.UpdateTicketAsync(dto));
+            var ex = await Should.ThrowAsync<TicketServiceException>(() => _service.UpdateTicketAsync(dto));
+            ex.InnerException.ShouldBe(repositoryException);
+            VerifyErrorLogged(repositoryException);
+        }
+
+        [Test]
+        public async Task UpdateTicketAsync_RepositoryUpdateThrows_LogsErrorAndThrowsTicketServiceException()
+        {
+            // Arrange
+            var dto = new TicketUpdateDto("Title", Guid.NewGuid(), "Description", TicketStatus.Open);
+            var repositoryException = new InvalidOperationException("repository failure");
+            _repositoryMock.Setup(r => r.GetByIdAsync(dto.Id)).ReturnsAsync(new Ticket { Id = dto.Id, Title = "Old", Description = "Old", Status = TicketStatus.Open });
+            _repositoryMock.Setup(r => r.UpdateAsync(It.IsAny<Ticket>())).ThrowsAsync(repositoryException);
+
+            // Act & Assert
+            var ex = await Should.ThrowAsync<TicketServiceException>(() => _service.UpdateTicketAsync(dto));
+            ex.InnerException.ShouldBe(repositoryException);
+            VerifyErrorLogged(repositoryException);
         }
     }
 }

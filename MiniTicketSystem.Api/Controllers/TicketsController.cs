@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MiniTicketSystem.Application.DTOs;
+using MiniTicketSystem.Application.Exceptions;
 using MiniTicketSystem.Application.Interfaces;
 using MiniTicketSystem.Domain.Enum;
 
@@ -19,48 +20,89 @@ namespace MiniTicketSystem.Api.Controllers
         }
 
         [HttpGet("Paged", Name = "PagedTickets")]
-        public async Task<Application.DTOs.PagedResult<TicketDto>> GetPagedTickets(TicketStatus? status, string? search, int page = 1, int pageSize = 10)
+        public async Task<ActionResult<Application.DTOs.PagedResult<TicketDto>>> GetPagedTickets(TicketStatus? status, string? search, int page = 1, int pageSize = 10)
         {
-            var result = await _ticketQueryService.GetPagedTicketsAsync(status, search, page, pageSize);
-            return result;
+            try
+            {
+                var result = await _ticketQueryService.GetPagedTicketsAsync(status, search, page, pageSize);
+                return Ok(result);
+            }
+            catch (TicketServiceException ex)
+            {
+                return ServiceError(ex);
+            }
         }
 
         [HttpGet(Name = "Get")]
-        public async Task<IEnumerable<TicketDto>> Get()
+        public async Task<ActionResult<IEnumerable<TicketDto>>> Get()
         {
-            var result = await _ticketQueryService.GetAllTicketsAsync();
-            return result;
+            try
+            {
+                var result = await _ticketQueryService.GetAllTicketsAsync();
+                return Ok(result);
+            }
+            catch (TicketServiceException ex)
+            {
+                return ServiceError(ex);
+            }
         }
 
         [HttpGet("{id:guid}", Name = "GetTicketById")]
         public async Task<ActionResult<TicketDto>> GetById(Guid id)
         {
-            var result = await _ticketQueryService.GetTicketByIdAsync(id);
-            if (result is null)
+            try
             {
-                return NotFound();
-            }
+                var result = await _ticketQueryService.GetTicketByIdAsync(id);
+                if (result is null)
+                {
+                    return NotFound();
+                }
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (TicketServiceException ex)
+            {
+                return ServiceError(ex);
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult<TicketDto>> CreateTicket(TicketInsertDto dto)
         {
-            var result = await _ticketCommandService.CreateTicketAsync(dto);
-            return Created($"/tickets/{result.Id}", result);
+            try
+            {
+                var result = await _ticketCommandService.CreateTicketAsync(dto);
+                return Created($"/tickets/{result.Id}", result);
+            }
+            catch (TicketServiceException ex)
+            {
+                return ServiceError(ex);
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<TicketDto>> UpdateTicket(TicketUpdateDto dto)
         {
-            var result = await _ticketCommandService.UpdateTicketAsync(dto);
-            if (result is null)
+            try
             {
-                return NotFound();
-            }
+                var result = await _ticketCommandService.UpdateTicketAsync(dto);
+                if (result is null)
+                {
+                    return NotFound();
+                }
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (TicketServiceException ex)
+            {
+                return ServiceError(ex);
+            }
         }
+
+        private ObjectResult ServiceError(TicketServiceException ex) =>
+            Problem(
+                title: "Wystąpił błąd",
+                detail: ex.Message,
+                statusCode: StatusCodes.Status500InternalServerError);
     }
 }
